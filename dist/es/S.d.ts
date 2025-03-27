@@ -1,3 +1,5 @@
+export declare type SignalOrType<T> = T | DataSignal<T> | ((value?: T) => T);
+export declare type SignalOrTypeArray<T> = SignalOrType<T> | SignalOrType<T[]> | SignalOrType<T>[] | SignalOrType<T[]>[];
 export interface S {
     root<T>(fn: (dispose?: () => void) => T): T;
     <T>(fn: () => T): () => T;
@@ -10,6 +12,8 @@ export interface S {
     value<T>(value: T, eq?: (a: T, b: T) => boolean): DataSignal<T>;
     freeze<T>(fn: () => T): T;
     sample<T>(fn: () => T): T;
+    $<T>(value: SignalOrType<T>): T;
+    compile<T>(value: SignalOrTypeArray<T>[]): T[];
     cleanup(fn: (final: boolean) => any): void;
     isFrozen(): boolean;
     isListening(): boolean;

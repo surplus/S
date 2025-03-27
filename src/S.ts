@@ -1,3 +1,6 @@
+export type SignalOrType<T> = T | DataSignal<T> | ((value? : T) => T);
+export type SignalOrTypeArray<T> = SignalOrType<T> | SignalOrType<T[]> | SignalOrType<T>[] | SignalOrType<T[]>[];
+
 export interface S {
     // Computation root
     root<T>(fn : (dispose? : () => void) => T) : T;
@@ -19,6 +22,10 @@ export interface S {
 
     // Sampling a signal
     sample<T>(fn : () => T) : T;
+    
+    // Convenience methods
+    $<T>(value: SignalOrType<T>) : T;
+    compile<T>(value : SignalOrTypeArray<T>[]) : T[];
 
     // Freeing external resources
     cleanup(fn : (final : boolean) => any) : void;
@@ -37,6 +44,8 @@ export interface DataSignal<T> {
     (val : T) : T;
 }
 
+const SYM = Symbol("S");
+
 // Public interface
 var S = <S>function S<T>(fn : (v : T | undefined) => T, value? : T) : () => T {
 
@@ -44,13 +53,19 @@ var S = <S>function S<T>(fn : (v : T | undefined) => T, value? : T) : () => T {
 
     var { node, value: _value } = makeComputationNode(fn, value, false, false);
 
+    var comp;
     if (node === null) {
-        return function computation() { return _value; }
+        comp = function computation() { return _value; };
     } else {
-        return function computation() {
+        comp = function computation() {
             return node!.current();
-        }
+        };
     }
+
+    // @ts-ignore
+    comp[SYM] = true;
+
+    return comp;
 };
 
 // compatibility with commonjs systems that expect default export to be at require('s.js').default rather than just require('s-js')
@@ -119,19 +134,24 @@ S.effect = function effect<T>(fn : (v : T | undefined) => T, value? : T) : void 
 S.data = function data<T>(value : T) : (value? : T) => T {
     var node = new DataNode(value);
 
-    return function data(value? : T) : T {
+    let sig = function data(value? : T) : T {
         if (arguments.length === 0) {
             return node.current();
         } else {
             return node.next(value);
         }
-    }
+    };
+
+    // @ts-ignore
+    sig[SYM] = true;
+
+    return sig;
 };
 
 S.value = function value<T>(current : T, eq? : (a : T, b : T) => boolean) : DataSignal<T> {
     var node  = new DataNode(current),
         age   = -1;
-    return function value(update? : T) {
+    var sig =  function value(update? : T) {
         if (arguments.length === 0) {
             return node.current();
         } else {
@@ -146,7 +166,27 @@ S.value = function value<T>(current : T, eq? : (a : T, b : T) => boolean) : Data
             }
             return update!;
         }
+    };
+
+    // @ts-ignore
+    sig[SYM] = true;
+
+    return sig;
+};
+
+S.$ = function get<T>(value: SignalOrType<T>) : T {
+    // @ts-ignore
+    while (value && value[SYM]) {
+        // @ts-ignore
+        value = value()!;
     }
+    return <T>value;
+};
+
+S.compile = function compile<T>(value : SignalOrTypeArray<T>[]) : T[] {
+    value = S.$(value);
+    // @ts-ignore
+    return Array.isArray(value) ? value.flatMap(S.compile) : S.$(value);
 };
 
 S.freeze = function freeze<T>(fn : () => T) : T {

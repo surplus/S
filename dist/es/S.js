@@ -1,16 +1,21 @@
+const SYM = Symbol("S");
 // Public interface
 var S = function S(fn, value) {
     if (Owner === null)
         console.warn("computations created without a root or parent will never be disposed");
-    var _a = makeComputationNode(fn, value, false, false), node = _a.node, _value = _a.value;
+    var { node, value: _value } = makeComputationNode(fn, value, false, false);
+    var comp;
     if (node === null) {
-        return function computation() { return _value; };
+        comp = function computation() { return _value; };
     }
     else {
-        return function computation() {
+        comp = function computation() {
             return node.current();
         };
     }
+    // @ts-ignore
+    comp[SYM] = true;
+    return comp;
 };
 // compatibility with commonjs systems that expect default export to be at require('s.js').default rather than just require('s-js')
 Object.defineProperty(S, 'default', { value: S });
@@ -68,7 +73,7 @@ S.effect = function effect(fn, value) {
 };
 S.data = function data(value) {
     var node = new DataNode(value);
-    return function data(value) {
+    let sig = function data(value) {
         if (arguments.length === 0) {
             return node.current();
         }
@@ -76,10 +81,13 @@ S.data = function data(value) {
             return node.next(value);
         }
     };
+    // @ts-ignore
+    sig[SYM] = true;
+    return sig;
 };
 S.value = function value(current, eq) {
     var node = new DataNode(current), age = -1;
-    return function value(update) {
+    var sig = function value(update) {
         if (arguments.length === 0) {
             return node.current();
         }
@@ -96,6 +104,22 @@ S.value = function value(current, eq) {
             return update;
         }
     };
+    // @ts-ignore
+    sig[SYM] = true;
+    return sig;
+};
+S.$ = function get(value) {
+    // @ts-ignore
+    while (value && value[SYM]) {
+        // @ts-ignore
+        value = value();
+    }
+    return value;
+};
+S.compile = function compile(value) {
+    value = S.$(value);
+    // @ts-ignore
+    return Array.isArray(value) ? value.flatMap(S.compile) : S.$(value);
 };
 S.freeze = function freeze(fn) {
     var result = undefined;
@@ -151,31 +175,30 @@ S.isListening = function isListening() {
 };
 // Internal implementation
 /// Graph classes and operations
-var Clock = /** @class */ (function () {
-    function Clock() {
+class Clock {
+    constructor() {
         this.time = 0;
         this.changes = new Queue(); // batched changes to data nodes
         this.updates = new Queue(); // computations to update
         this.disposes = new Queue(); // disposals to run after current batch of updates finishes
     }
-    return Clock;
-}());
+}
 var RootClockProxy = {
     time: function () { return RootClock.time; }
 };
-var DataNode = /** @class */ (function () {
-    function DataNode(value) {
+class DataNode {
+    constructor(value) {
         this.value = value;
         this.pending = NOTPENDING;
         this.log = null;
     }
-    DataNode.prototype.current = function () {
+    current() {
         if (Listener !== null) {
             logDataRead(this);
         }
         return this.value;
-    };
-    DataNode.prototype.next = function (value) {
+    }
+    next(value) {
         if (RunningClock !== null) {
             if (this.pending !== NOTPENDING) { // value has already been set once, check for conflicts
                 if (value !== this.pending) {
@@ -198,14 +221,13 @@ var DataNode = /** @class */ (function () {
             }
         }
         return value;
-    };
-    DataNode.prototype.clock = function () {
+    }
+    clock() {
         return RootClockProxy;
-    };
-    return DataNode;
-}());
-var ComputationNode = /** @class */ (function () {
-    function ComputationNode() {
+    }
+}
+class ComputationNode {
+    constructor() {
         this.fn = null;
         this.value = undefined;
         this.age = -1;
@@ -218,7 +240,7 @@ var ComputationNode = /** @class */ (function () {
         this.owned = null;
         this.cleanups = null;
     }
-    ComputationNode.prototype.current = function () {
+    current() {
         if (Listener !== null) {
             if (this.age === RootClock.time) {
                 if (this.state === RUNNING)
@@ -229,42 +251,39 @@ var ComputationNode = /** @class */ (function () {
             logComputationRead(this);
         }
         return this.value;
-    };
-    ComputationNode.prototype.clock = function () {
+    }
+    clock() {
         return RootClockProxy;
-    };
-    return ComputationNode;
-}());
-var Log = /** @class */ (function () {
-    function Log() {
+    }
+}
+class Log {
+    constructor() {
         this.node1 = null;
         this.node1slot = 0;
         this.nodes = null;
         this.nodeslots = null;
     }
-    return Log;
-}());
-var Queue = /** @class */ (function () {
-    function Queue() {
+}
+class Queue {
+    constructor() {
         this.items = [];
         this.count = 0;
     }
-    Queue.prototype.reset = function () {
+    reset() {
         this.count = 0;
-    };
-    Queue.prototype.add = function (item) {
+    }
+    add(item) {
         this.items[this.count++] = item;
-    };
-    Queue.prototype.run = function (fn) {
+    }
+    run(fn) {
         var items = this.items;
         for (var i = 0; i < this.count; i++) {
             fn(items[i]);
             items[i] = null;
         }
         this.count = 0;
-    };
-    return Queue;
-}());
+    }
+}
 // Constants
 var NOTPENDING = {}, CURRENT = 0, STALE = 1, RUNNING = 2, UNOWNED = new ComputationNode();
 // "Globals" used to keep track of current system state
