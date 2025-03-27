@@ -29,4 +29,12 @@ describe('S.compile', function () {
 			),
 		).toEqual([42, 1337]);
 	});
+
+	it('it culls undefined and null values', function () {
+		expect(
+			S.compile(
+				S.data([S.value(42), [[undefined], null, S.value(1337)]]),
+			),
+		).toEqual([42, 1337]);
+	});
 });

@@ -141,7 +141,9 @@
 	S.compile = function compile(value) {
 		value = S.$(value);
 		// @ts-ignore
-		return Array.isArray(value) ? value.flatMap(S.compile) : S.$(value);
+		return Array.isArray(value)
+			? value.flatMap(S.compile).filter((v) => v != undefined)
+			: S.$(value);
 	};
 	S.freeze = function freeze(fn) {
 		var result = undefined;
@@ -323,7 +325,10 @@
 		Owner = null, // owner for new computations
 		LastNode = null; // cached unused node, for re-use
 	// Functions
-	var makeComputationNodeResult = { node: null, value: undefined };
+	var makeComputationNodeResult = {
+		node: null,
+		value: undefined,
+	};
 	function makeComputationNode(fn, value, orphan, sample) {
 		var node = getCandidateNode(),
 			owner = Owner,
