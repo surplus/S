@@ -104,7 +104,7 @@ const S = <S>function S<T>(fn: (v: T) => T, value: T): () => T {
 				} else {
 					if (sclock.depth > rclock.depth) sclock = sclock.parent!;
 					while (rclock.parent !== sclock.parent)
-						(rclock = rclock.parent!), (sclock = sclock.parent!);
+						((rclock = rclock.parent!), (sclock = sclock.parent!));
 					logClockPreClock(sclock, rclock, RunningNode);
 				}
 
@@ -212,7 +212,7 @@ S.data = function data<T>(value: T): (value?: T) => T {
 				sclock = sclock.parent!;
 			if (sclock.parent !== rclock)
 				while (rclock.parent !== sclock.parent)
-					(rclock = rclock.parent!), (sclock = sclock.parent!);
+					((rclock = rclock.parent!), (sclock = sclock.parent!));
 
 			if (rclock !== sclock) {
 				updateClock(sclock);

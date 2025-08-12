@@ -1,25 +1,32 @@
 {
-	"name": "s-js",
-	"version": "0.4.9",
+	"name": "@surplus/s",
+	"version": "1.0.0",
 	"description": "S.js - simple, clean, fast reactive programming in Javascript",
 	"main": "dist/S.js",
 	"module": "dist/es/S.js",
 	"types": "dist/es/S.d.ts",
-	"dependencies": {},
+	"files": [
+		"dist/S.js",
+		"dist/es/S.js",
+		"dist/es/S.d.ts",
+		"dist/withsubclocks.js",
+		"dist/es/withsubclocks.js",
+		"dist/es/withsubclocks.d.ts",
+		"README.md",
+		"LICENSE"
+	],
 	"devDependencies": {
 		"jasmine": "^3.4.0",
-		"karma": "^4.1.0",
-		"karma-chrome-launcher": "^2.2.0",
-		"karma-jasmine": "^2.0.1",
 		"rollup": "^1.16.2",
-		"typescript": "^3.5.2",
-		"prettier": "^3.5.3"
+		"typescript": "^5.9.2",
+		"prettier": "^3.6.2"
 	},
 	"scripts": {
 		"build": "tsc && rollup dist/es/S.js -f \"umd\" -n \"S\" -o dist/S.js && rollup dist/es/withsubclocks.js -f \"umd\" -n \"S\" -o dist/withsubclocks.js",
 		"test": "jasmine",
 		"bench": "node --allow-natives-syntax bench/bench.js",
-		"format": "prettier -w ."
+		"format": "prettier -w .",
+		"prepublish": "pnpm build"
 	},
 	"keywords": [
 		"reactive",
@@ -28,13 +35,17 @@
 		"signal",
 		"dependency"
 	],
+	"homepage": "https://github.com/surplus",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/adamhaile/S.git"
+		"url": "git+https://github.com/surplus/s.git"
 	},
 	"bugs": {
-		"url": "https://github.com/adamhaile/S/issues"
+		"url": "https://github.com/surplus/s/issues"
 	},
-	"author": "Adam Haile",
+	"author": "Josh Junon (https://github.com/qix-)",
+	"contributors": [
+		"Adam Haile (https://github.com/adamhaile)"
+	],
 	"license": "MIT"
 }

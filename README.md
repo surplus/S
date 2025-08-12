@@ -299,9 +299,9 @@ const foo = S.data(1),
 S.freeze(() => {
 	foo(3); // schedule two changes to run together
 	bar(4);
-	foo(), bar(); // still returns 1 and 2, as change hasn't been applied yet!
+	(foo(), bar()); // still returns 1 and 2, as change hasn't been applied yet!
 });
-foo(), bar(); // now returns 3 and 4
+(foo(), bar()); // now returns 3 and 4
 ```
 
 Note that inside a computation, time is already frozen, due to the global atomic timeline, so in that context `S.freeze()` is inert.
@@ -474,7 +474,7 @@ However, the cost of this optimization, besides the complexity introduced, is th
 
 Run computations and data signals created by `<code>` on a subclock, meaning that they don't just run but run _to completion_ before surrounding code reads them.
 
-This is still an experimental feature, meaning it's still proving its usefulness in S and may be removed and/or changed in the future. It currently requires the use of a different compilation of S: `import S from 's-js/withsubclocks';`
+This is still an experimental feature, meaning it's still proving its usefulness in S and may be removed and/or changed in the future. It currently requires the use of a different compilation of S: `import S from '@surplus/s/withsubclocks';`
 
 `S.subclock()` is only meaningful in scenarios where we are setting data signals from computations. The problem it solves is to restore synchronicity to such changes by removing other computation's awareness of intermediate states and exposing only the final, at rest state.
 
@@ -516,4 +516,8 @@ In effect, subclocks "partition" time, allowing the subclock to go through many 
 
 Subclocks can be used to make optimizations like the ones above synchronous, and can also provide synchronous equivalents to many of the utilities in event-based, data-flow oriented reactive libraries, like filtering events so that only ones meeting certain conditions propagate.
 
-&copy; 2013-present Adam Haile, adam.haile@gmail.com. MIT License.
+# License
+
+&copy; 2013-2025 Adam Haile, adam.haile@gmail.com. MIT License.
+
+Certain portions of this code are &copy; 2024-2025 Joshua Lee Junon.

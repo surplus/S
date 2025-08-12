@@ -238,7 +238,7 @@ describe('S()', function () {
 		var d, fcount, f, gcount, g;
 
 		function init() {
-			(d = S.data(1)),
+			((d = S.data(1)),
 				(fcount = 0),
 				(f = S(function () {
 					fcount++;
@@ -248,7 +248,7 @@ describe('S()', function () {
 				(g = S(function () {
 					gcount++;
 					return f();
-				}));
+				})));
 		}
 
 		it('does not cause re-evaluation', function () {
@@ -360,7 +360,7 @@ describe('S()', function () {
 						seq += 'b2';
 					}),
 					c1 = S(function () {
-						b1(), b2();
+						(b1(), b2());
 						seq += 'c1';
 					});
 

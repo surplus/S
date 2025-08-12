@@ -227,9 +227,9 @@ S.$ = function get<T>(value: SignalOrType<T>): T {
 
 S.compile = function compile<T>(value: SignalOrTypeArray<T>[]): T[] {
 	value = S.$(value);
-	// @ts-ignore
 	return Array.isArray(value)
-		? value.flatMap(S.compile).filter((v) => v != undefined)
+		? // @ts-ignore
+			value.flatMap(S.compile).filter((v) => v != undefined)
 		: S.$(value);
 };
 
