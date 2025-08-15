@@ -1,6 +1,6 @@
 {
 	"name": "@surplus/s",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "S.js - simple, clean, fast reactive programming in Javascript",
 	"main": "dist/S.js",
 	"types": "dist/S.d.ts",
