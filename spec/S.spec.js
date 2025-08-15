@@ -199,6 +199,7 @@ describe('S()', function () {
 	describe('that creates an S.data', function () {
 		it('does not register a dependency', function () {
 			S.root(function () {
+				var d;
 				var fevals = 0,
 					f = S(function () {
 						fevals++;

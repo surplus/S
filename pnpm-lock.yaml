@@ -8,13 +8,13 @@ importers:
   .:
     devDependencies:
       jasmine:
-        specifier: ^3.4.0
+        specifier: ^3.99.0
         version: 3.99.0
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
       rollup:
-        specifier: ^1.16.2
+        specifier: ^1.32.1
         version: 1.32.1
       typescript:
         specifier: ^5.9.2
@@ -27,10 +27,10 @@ packages:
         integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==,
       }
 
-  "@types/node@24.2.1":
+  "@types/node@24.3.0":
     resolution:
       {
-        integrity: sha512-DRh5K+ka5eJic8CjH7td8QpYEV6Zo10gfRkjHCO3weqZHWDtAaSTFtl4+VMqOJ4N5jcuhZ9/l+yy8rVgw7BQeQ==,
+        integrity: sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==,
       }
 
   acorn@7.4.1:
@@ -155,7 +155,7 @@ packages:
 snapshots:
   "@types/estree@1.0.8": {}
 
-  "@types/node@24.2.1":
+  "@types/node@24.3.0":
     dependencies:
       undici-types: 7.10.0
 
@@ -210,7 +210,7 @@ snapshots:
   rollup@1.32.1:
     dependencies:
       "@types/estree": 1.0.8
-      "@types/node": 24.2.1
+      "@types/node": 24.3.0
       acorn: 7.4.1
 
   typescript@5.9.2: {}

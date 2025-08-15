@@ -3,28 +3,28 @@
 	"version": "1.0.0",
 	"description": "S.js - simple, clean, fast reactive programming in Javascript",
 	"main": "dist/S.js",
-	"module": "dist/es/S.js",
-	"types": "dist/es/S.d.ts",
+	"types": "dist/S.d.ts",
+	"type": "module",
 	"files": [
 		"dist/S.js",
-		"dist/es/S.js",
-		"dist/es/S.d.ts",
+		"dist/S.d.ts",
 		"dist/withsubclocks.js",
-		"dist/es/withsubclocks.js",
-		"dist/es/withsubclocks.d.ts",
+		"dist/withsubclocks.d.ts",
 		"README.md",
 		"LICENSE"
 	],
 	"devDependencies": {
 		"jasmine": "^3.4.0",
-		"rollup": "^1.16.2",
 		"typescript": "^5.9.2",
 		"prettier": "^3.6.2"
 	},
 	"scripts": {
-		"build": "tsc && rollup dist/es/S.js -f \"umd\" -n \"S\" -o dist/S.js && rollup dist/es/withsubclocks.js -f \"umd\" -n \"S\" -o dist/withsubclocks.js",
+		"build": "tsc",
 		"test": "jasmine",
 		"bench": "node --allow-natives-syntax bench/bench.js",
+		"lint:format": "prettier -c .",
+		"lint:types": "tsc --noEmit",
+		"lint": "pnpm lint:types && pnpm lint:format",
 		"format": "prettier -w .",
 		"prepare": "pnpm build"
 	},

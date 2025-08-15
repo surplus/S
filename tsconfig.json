@@ -1,11 +1,12 @@
 {
 	"include": ["src/S.ts", "src/withsubclocks.ts"],
 	"compilerOptions": {
-		"lib": ["es2019", "dom"],
-		"target": "es2019",
-		"module": "es2015",
+		"lib": ["esnext", "dom"],
+		"target": "esnext",
+		"module": "esnext",
 		"strict": true,
-		"outDir": "dist/es",
-		"declaration": true
+		"outDir": "dist",
+		"declaration": true,
+		"isolatedModules": true
 	}
 }

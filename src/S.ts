@@ -291,7 +291,7 @@ interface IDataNode<T> extends INode<T> {
 	next(value: T): T;
 }
 
-export { INode as Node, IDataNode as DataNode, IClock as Clock };
+export type { INode as Node, IDataNode as DataNode, IClock as Clock };
 
 S.makeComputationNode = makeComputationNode;
 S.disposeNode = function disposeNode(node: ComputationNode) {
