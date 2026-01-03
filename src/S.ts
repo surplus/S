@@ -56,6 +56,17 @@ export interface S {
 		sample: boolean,
 	): { node: INode<T> | null; value: T };
 	disposeNode(node: INode<any>): void;
+
+	// EXPERIMENTAL - asynchronous root that can suspend
+	// usage may lead to memory leaks if dispose is not called,
+	// or if the Promise never resolves. It's also unspecified
+	// what happens if roots are nested between async boundaries,
+	// especially if synchronous/asynchronous roots are mixed.
+	//
+	// This is useful almost exclusively when testing integrations
+	// that use @surplus/s. Do not use this in application code unless
+	// you fully understand the implications.
+	unsafeAsyncRoot<T>(fn: (dispose: () => void) => Promise<T>): Promise<T>;
 }
 
 export interface DataSignal<T> {
@@ -95,6 +106,42 @@ var S = <S>function S<T>(fn: (v: T | undefined) => T, value?: T): () => T {
 Object.defineProperty(S, "default", { value: S });
 
 export default S;
+
+S.unsafeAsyncRoot = function unsafeAsyncRoot<T>(
+	fn: (dispose: () => void) => Promise<T>,
+): Promise<T> {
+	var owner = Owner,
+		disposer =
+			fn.length === 0
+				? null
+				: function _dispose() {
+						if (root === null) {
+							// nothing to dispose
+						} else if (RunningClock !== null) {
+							RootClock.disposes.add(root);
+						} else {
+							dispose(root);
+						}
+					},
+		root = disposer === null ? UNOWNED : getCandidateNode();
+
+	Owner = root;
+
+	return (disposer === null ? (fn as any)() : fn(disposer))
+		.finally(() => {
+			Owner = owner;
+		})
+		.then((result: T) => {
+			if (
+				disposer !== null &&
+				recycleOrClaimNode(root, null as any, undefined, true)
+			) {
+				root = null!;
+			}
+
+			return result;
+		});
+};
 
 S.root = function root<T>(fn: (dispose: () => void) => T): T {
 	var owner = Owner,
